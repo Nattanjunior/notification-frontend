@@ -6,9 +6,10 @@ import Header from "@/app/components/layout/header";
 import ActivityFeed from "@/app/components/dashboard/activity-feed";
 import LiveLog from "@/app/components/dashboard/live-log";
 import DispatchCore from "@/app/components/dashboard/dispatch-core";
+import MetricsView from "@/app/components/dashboard/metrics-view";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('feed');
+  const [activeTab, setActiveTab] = useState('metrics');
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
@@ -20,7 +21,9 @@ export default function Home() {
         <Header />
 
         <main className="flex-1 flex overflow-hidden">
-          {activeTab === 'feed' ? (
+          {activeTab === 'metrics' ? (
+            <MetricsView />
+          ) : activeTab === 'feed' ? (
             <>
               {/* Feed de Atividades (Centro) */}
               <ActivityFeed />
