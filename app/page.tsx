@@ -10,14 +10,20 @@ import MetricsView from "@/app/components/dashboard/metrics-view";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('metrics');
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
       {/* Sidebar Fixa */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
+      />
 
       {/* Área Principal */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
         <Header />
 
         <main className="flex-1 flex overflow-hidden">
