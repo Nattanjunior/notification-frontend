@@ -26,9 +26,9 @@ import {
 import LayoutClient from '@/app/components/layout/layout-client';
 
 const DispatchCenterView = () => {
-  const [priority, setPriority] = useState('High');
+  const [priority, setPriority] = useState('Alta');
   const [channels, setChannels] = useState(['WebSocket', 'Push']);
-  const [schedule, setSchedule] = useState('Send Now');
+  const [schedule, setSchedule] = useState('Enviar Agora');
 
   const toggleChannel = (channel: string) => {
     if (channels.includes(channel)) {
@@ -43,8 +43,8 @@ const DispatchCenterView = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-y-auto p-8 gap-8 no-scrollbar">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Create New Dispatch</h1>
-          <p className="text-muted-foreground text-sm">Configure high-priority notification delivery across multiple infrastructure nodes.</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Criar Novo Despacho</h1>
+          <p className="text-muted-foreground text-sm">Configure a entrega de notificações de alta prioridade em vários nós de infraestrutura.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -56,13 +56,13 @@ const DispatchCenterView = () => {
                 <div className="p-2 bg-primary/10 rounded-lg text-primary">
                   <Settings2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl font-bold">Configuration</h3>
+                <h3 className="text-xl font-bold">Configuração</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Recipient Identifier */}
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Recipient Identifier</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Identificador do Destinatário</label>
                   <input
                     type="text"
                     defaultValue="usr_9482_alpha_prod"
@@ -72,19 +72,19 @@ const DispatchCenterView = () => {
 
                 {/* Category */}
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Category</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Categoria</label>
                   <select className="w-full bg-white/5 border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/50 appearance-none transition-all">
-                    <option>System Transaction</option>
-                    <option>User Alert</option>
+                    <option>Transação do Sistema</option>
+                    <option>Alerta do Usuário</option>
                     <option>Marketing</option>
                   </select>
                 </div>
 
                 {/* Priority Level */}
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Priority Level</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Nível de Prioridade</label>
                   <div className="flex bg-white/5 p-1 rounded-xl border border-border/30 gap-1.5">
-                    {['Low', 'Med', 'High'].map((p) => (
+                    {['Baixa', 'Média', 'Alta'].map((p) => (
                       <button
                         key={p}
                         onClick={() => setPriority(p)}
@@ -101,18 +101,18 @@ const DispatchCenterView = () => {
 
                 {/* Template Selector */}
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Template Selector</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Seletor de Modelo</label>
                   <select className="w-full bg-white/5 border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/50 appearance-none transition-all">
-                    <option>System Alert</option>
-                    <option>Payment Auth</option>
-                    <option>Login Verification</option>
+                    <option>Alerta do Sistema</option>
+                    <option>Autenticação de Pagamento</option>
+                    <option>Verificação de Login</option>
                   </select>
                 </div>
               </div>
 
               {/* Delivery Channels */}
               <div className="flex flex-col gap-4">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Delivery Channels</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Canais de Entrega</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
                     { name: 'WebSocket', icon: Wifi },
@@ -145,17 +145,17 @@ const DispatchCenterView = () => {
                   <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
                     <Code2 className="w-5 h-5" />
                   </div>
-                  <h3 className="text-xl font-bold text-purple-100">Payload Editor</h3>
+                  <h3 className="text-xl font-bold text-purple-100">Editor de Payload</h3>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-muted-foreground">12ms Latency</span>
+                  <span className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-muted-foreground">Latência 12ms</span>
                   <span className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-muted-foreground">24 KB</span>
                 </div>
               </div>
 
               <div className="bg-[#0a0a0c] border border-border/50 rounded-xl p-6 font-mono text-sm overflow-hidden relative group">
                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="px-3 py-1 bg-white/10 rounded text-[10px] font-bold text-white hover:bg-white/20">Copy</button>
+                  <button className="px-3 py-1 bg-white/10 rounded text-[10px] font-bold text-white hover:bg-white/20">Copiar</button>
                 </div>
                 <pre className="text-purple-300/90 leading-relaxed">
                   {`{
@@ -178,30 +178,30 @@ const DispatchCenterView = () => {
                 <div className="p-2 bg-primary/10 rounded-lg text-primary">
                   <Settings className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl font-bold">Delivery Options</h3>
+                <h3 className="text-xl font-bold">Opções de Entrega</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="flex items-center justify-between p-4 bg-white/2 border border-border/30 rounded-xl">
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-bold">Max Retries</span>
-                    <span className="text-[10px] text-muted-foreground font-medium">Auto-retry on failure</span>
+                    <span className="text-xs font-bold">Máximo de Tentativas</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">Auto-tentativa em caso de falha</span>
                   </div>
                   <input type="number" defaultValue="3" className="w-16 bg-white/5 border border-border/50 rounded-lg px-3 py-1.5 text-center text-sm font-mono focus:outline-none focus:border-primary/50" />
                 </div>
 
                 <div className="flex items-center justify-between p-4 bg-white/2 border border-border/30 rounded-xl">
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-bold">TTL (Minutes)</span>
-                    <span className="text-[10px] text-muted-foreground font-medium">Time-to-live for dispatch</span>
+                    <span className="text-xs font-bold">TTL (Minutos)</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">Tempo de vida do despacho</span>
                   </div>
                   <input type="number" defaultValue="60" className="w-16 bg-white/5 border border-border/50 rounded-lg px-3 py-1.5 text-center text-sm font-mono focus:outline-none focus:border-primary/50" />
                 </div>
 
                 <div className="flex items-center justify-between p-4 bg-white/2 border border-border/30 rounded-xl">
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-bold">Fallback Enabled</span>
-                    <span className="text-[10px] text-muted-foreground font-medium">Route via alternate channel</span>
+                    <span className="text-xs font-bold">Fallback Ativado</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">Rota via canal alternativo</span>
                   </div>
                   <button className="text-primary hover:text-primary/80 transition-colors">
                     <ToggleRight className="w-8 h-8" />
@@ -210,8 +210,8 @@ const DispatchCenterView = () => {
 
                 <div className="flex items-center justify-between p-4 bg-white/2 border border-border/30 rounded-xl">
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-bold">Select Fallback Channel</span>
-                    <span className="text-[10px] text-muted-foreground font-medium">Automatic redirection</span>
+                    <span className="text-xs font-bold">Selecionar Canal de Fallback</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">Redirecionamento automático</span>
                   </div>
                   <select className="bg-white/5 border border-border/50 rounded-lg px-3 py-1.5 text-xs font-bold focus:outline-none focus:border-primary/50">
                     <option>Email</option>
@@ -230,14 +230,14 @@ const DispatchCenterView = () => {
                 <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
                   <Clock className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl font-bold">Scheduling</h3>
+                <h3 className="text-xl font-bold">Agendamento</h3>
               </div>
 
               <div className="flex flex-col gap-3">
                 {[
-                  { id: 'Send Now', icon: Zap, label: 'Send Now', desc: 'Immediate queue execution' },
-                  { id: 'Schedule', icon: Calendar, label: 'Schedule', desc: 'Specific date and time' },
-                  { id: 'Recurring', icon: Repeat, label: 'Recurring', desc: 'Interval-based dispatch' },
+                  { id: 'Enviar Agora', icon: Zap, label: 'Enviar Agora', desc: 'Execução imediata da fila' },
+                  { id: 'Agendar', icon: Calendar, label: 'Agendar', desc: 'Data e hora específicas' },
+                  { id: 'Recorrente', icon: Repeat, label: 'Recorrente', desc: 'Despacho baseado em intervalo' },
                 ].map((s) => (
                   <button
                     key={s.id}
@@ -261,7 +261,7 @@ const DispatchCenterView = () => {
 
             {/* Dispatch Preview Card */}
             <div className="bg-card/30 border border-border/50 rounded-2xl p-8 flex flex-col gap-6 shadow-sm">
-              <h3 className="text-xl font-bold">Dispatch Preview</h3>
+              <h3 className="text-xl font-bold">Visualização do Despacho</h3>
 
               <div className="relative flex flex-col items-center py-8 gap-8">
                 {/* Visual Path */}
@@ -275,8 +275,8 @@ const DispatchCenterView = () => {
 
                   <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-purple-500/50 relative">
                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                      <span className="text-[9px] font-mono text-muted-foreground bg-background px-2 py-0.5 rounded border border-border/30">SIMULATED 12ms</span>
-                      <span className="text-[9px] font-mono text-muted-foreground mt-1">PATH latency</span>
+                      <span className="text-[9px] font-mono text-muted-foreground bg-background px-2 py-0.5 rounded border border-border/30">SIMULADO 12ms</span>
+                      <span className="text-[9px] font-mono text-muted-foreground mt-1">latência PATH</span>
                     </div>
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary animate-ping" />
                   </div>
@@ -294,7 +294,7 @@ const DispatchCenterView = () => {
 
                 <div className="w-full p-4 bg-white/5 rounded-xl border border-border/30 text-center">
                   <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-                    "Estimated delivery route via US-EAST-1 cluster. Redundancy protocols active."
+                    "Rota de entrega estimada via cluster US-EAST-1. Protocolos de redundância ativos."
                   </p>
                 </div>
               </div>
@@ -303,7 +303,7 @@ const DispatchCenterView = () => {
             {/* Execute Dispatch Button */}
             <button className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-sm flex items-center justify-center gap-3 shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all group uppercase tracking-widest">
               <Rocket className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              Execute Dispatch
+              Executar Despacho
             </button>
           </div>
         </div>
@@ -311,13 +311,13 @@ const DispatchCenterView = () => {
 
       <div className="w-80 border-l border-border bg-card/10 flex flex-col shrink-0 overflow-hidden">
         <div className="p-6 border-b border-border flex justify-between items-center bg-white/2">
-          <h3 className="font-bold text-lg tracking-tight">Live Stream</h3>
-          <div className="px-2 py-0.5 bg-red-500/10 rounded text-[10px] font-bold text-red-500 border border-red-500/20">LIVE</div>
+          <h3 className="font-bold text-lg tracking-tight">Transmissão ao Vivo</h3>
+          <div className="px-2 py-0.5 bg-red-500/10 rounded text-[10px] font-bold text-red-500 border border-red-500/20">AO VIVO</div>
         </div>
 
         <div className="p-6 border-b border-border bg-white/2">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Throughput</span>
+            <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Taxa de Transferência</span>
             <span className="text-[10px] font-mono text-muted-foreground">1.2k ops/s</span>
           </div>
           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
@@ -327,11 +327,11 @@ const DispatchCenterView = () => {
 
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 no-scrollbar">
           {[
-            { id: '#DP-44021', time: '14:55:02', msg: 'Payment authorized for @jane_dev', type: 'WS_OK', lat: '8ms', color: 'text-green-400' },
-            { id: '#DP-44018', time: '14:54:58', msg: 'System alert: High CPU usage on Node-7', type: 'PUSH_RETRY', lat: '240ms', color: 'text-yellow-400' },
-            { id: '#DP-44015', time: '14:54:45', msg: 'API key rotated for Project: Mercury', type: 'WS_OK', lat: '11ms', color: 'text-green-400' },
-            { id: '#DP-44012', time: '14:54:20', msg: 'Batch dispatch: 154 items queued', type: 'ASYNC_OK', lat: '', color: 'text-blue-400' },
-            { id: '#DP-44010', time: '14:53:55', msg: 'Dispatch failed: Recipient unreachable', type: 'ERR_TIMEOUT', lat: '', color: 'text-red-400' },
+            { id: '#DP-44021', time: '14:55:02', msg: 'Pagamento autorizado para @jane_dev', type: 'WS_OK', lat: '8ms', color: 'text-green-400' },
+            { id: '#DP-44018', time: '14:54:58', msg: 'Alerta do sistema: Alto uso de CPU no Nó-7', type: 'PUSH_RETRY', lat: '240ms', color: 'text-yellow-400' },
+            { id: '#DP-44015', time: '14:54:45', msg: 'Chave de API rotacionada para o Projeto: Mercury', type: 'WS_OK', lat: '11ms', color: 'text-green-400' },
+            { id: '#DP-44012', time: '14:54:20', msg: 'Despacho em lote: 154 itens na fila', type: 'ASYNC_OK', lat: '', color: 'text-blue-400' },
+            { id: '#DP-44010', time: '14:53:55', msg: 'Falha no despacho: Destinatário inacessível', type: 'ERR_TIMEOUT', lat: '', color: 'text-red-400' },
           ].map((log) => (
             <div key={log.id} className="bg-white/2 border border-border/30 rounded-xl p-4 flex flex-col gap-3 group hover:border-primary/30 transition-all cursor-pointer">
               <div className="flex justify-between items-start">
@@ -349,7 +349,7 @@ const DispatchCenterView = () => {
 
         <div className="p-4 border-t border-border bg-white/2">
           <button className="w-full flex items-center justify-center gap-2 py-2 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-all uppercase tracking-widest">
-            <Layout className="w-3.5 h-3.5" /> View Full Dispatch History
+            <Layout className="w-3.5 h-3.5" /> Ver Histórico Completo de Despacho
           </button>
         </div>
       </div>
