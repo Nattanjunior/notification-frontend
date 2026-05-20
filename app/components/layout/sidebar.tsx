@@ -28,18 +28,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
   const pathname = usePathname();
 
   const menuItems = [
-    { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics', href: '/analytics' },
+    { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Análise', href: '/analytics' },
     { id: 'feed', icon: <MessageSquare className="w-5 h-5" />, label: 'Feed', href: '/feed' },
-    { id: 'dispatch-center', icon: <Send className="w-5 h-5" />, label: 'Dispatch Center', href: '/dispatch-center' },
-    { id: 'api-keys', icon: <Key className="w-5 h-5" />, label: 'API Keys', href: '/api-keys' },
-    { id: 'connections', icon: <Link2 className="w-5 h-5" />, label: 'Connections', href: '/connections' },
+    { id: 'dispatch-center', icon: <Send className="w-5 h-5" />, label: 'Central de Despacho', href: '/dispatch-center' },
+    { id: 'api-keys', icon: <Key className="w-5 h-5" />, label: 'Chaves de API', href: '/api-keys' },
+    { id: 'connections', icon: <Link2 className="w-5 h-5" />, label: 'Conexões', href: '/connections' },
     { id: 'webhooks', icon: <Webhook className="w-5 h-5" />, label: 'Webhooks', href: '/webhooks' },
-    { id: 'templates', icon: <Layout className="w-5 h-5" />, label: 'Templates', href: '/templates' },
+    { id: 'templates', icon: <Layout className="w-5 h-5" />, label: 'Modelos', href: '/templates' },
   ];
 
   const bottomItems = [
-    { icon: <FileText className="w-5 h-5" />, label: 'Docs', href: '#' },
-    { icon: <LifeBuoy className="w-5 h-5" />, label: 'Support', href: '#' },
+    { icon: <FileText className="w-5 h-5" />, label: 'Documentos', href: '#' },
+    { icon: <LifeBuoy className="w-5 h-5" />, label: 'Suporte', href: '#' },
   ];
 
   return (
