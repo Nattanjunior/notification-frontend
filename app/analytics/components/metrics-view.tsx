@@ -41,13 +41,11 @@ const AnalyticsView = () => {
   const [throughputData, setThroughputData] = useState<number[]>([]);
 
   useEffect(() => {
-    // Generate data on the client side only to avoid hydration mismatch
     setThroughputData(Array.from({ length: 40 }, () => Math.floor(Math.random() * 80) + 20));
   }, []);
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto p-6 gap-6 bg-background no-scrollbar">
-      {/* Top Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <StatCard title="Notifications Sent" value="1,248,308" change="+12%" />
         <StatCard title="Delivery Rate" value="99.98%" />
@@ -57,9 +55,7 @@ const AnalyticsView = () => {
         <StatCard title="Failed Deliveries" value="12" status="Retry Active" />
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column - Throughput Chart */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           <div className="bg-card/30 border border-border/50 rounded-xl p-6 flex flex-col gap-6">
             <div className="flex justify-between items-center">
@@ -75,7 +71,6 @@ const AnalyticsView = () => {
               </div>
             </div>
 
-            {/* Bar Chart Visualization */}
             <div className="h-64 flex items-end gap-1 px-2">
               {throughputData.map((val, i) => (
                 <div
@@ -87,7 +82,6 @@ const AnalyticsView = () => {
             </div>
           </div>
 
-          {/* Channel Performance Table */}
           <div className="bg-card/30 border border-border/50 rounded-xl overflow-hidden">
             <div className="px-6 py-4 border-b border-border/50 flex justify-between items-center">
               <h3 className="font-bold">Channel Performance</h3>
@@ -140,28 +134,23 @@ const AnalyticsView = () => {
           </div>
         </div>
 
-        {/* Right Column - Delivery Composition & Events */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          {/* Delivery Composition Donut */}
           <div className="bg-card/30 border border-border/50 rounded-xl p-6 flex flex-col gap-6">
             <h3 className="font-bold text-foreground">Delivery Composition</h3>
             <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                {/* Delivered Segment */}
                 <circle
                   cx="50" cy="50" r="40"
                   fill="transparent" stroke="currentColor" strokeWidth="8"
                   strokeDasharray="251.2" strokeDashoffset="25.12"
                   className="text-primary"
                 />
-                {/* Retried Segment */}
                 <circle
                   cx="50" cy="50" r="40"
                   fill="transparent" stroke="currentColor" strokeWidth="8"
                   strokeDasharray="251.2" strokeDashoffset="226.08"
                   className="text-yellow-500/50"
                 />
-                {/* Failed Segment */}
                 <circle
                   cx="50" cy="50" r="40"
                   fill="transparent" stroke="currentColor" strokeWidth="8"
@@ -192,7 +181,6 @@ const AnalyticsView = () => {
             </div>
           </div>
 
-          {/* System Event Stream */}
           <div className="bg-card/30 border border-border/50 rounded-xl flex flex-col flex-1 overflow-hidden min-h-[400px]">
             <div className="px-4 py-3 border-b border-border/50 flex justify-between items-center bg-white/5">
               <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">

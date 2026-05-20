@@ -1,4 +1,6 @@
 import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   BarChart3,
   MessageSquare,
@@ -18,26 +20,26 @@ import {
 } from 'lucide-react';
 
 interface SidebarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
+  const pathname = usePathname();
+
   const menuItems = [
-    { id: 'metrics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
-    { id: 'feed', icon: <MessageSquare className="w-5 h-5" />, label: 'Feed' },
-    { id: 'create', icon: <Send className="w-5 h-5" />, label: 'Dispatch Center' },
-    { id: 'api-keys', icon: <Key className="w-5 h-5" />, label: 'API Keys' },
-    { id: 'connections', icon: <Link2 className="w-5 h-5" />, label: 'Connections' },
-    { id: 'webhooks', icon: <Webhook className="w-5 h-5" />, label: 'Webhooks' },
-    { id: 'templates', icon: <Layout className="w-5 h-5" />, label: 'Templates' },
+    { id: 'analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics', href: '/analytics' },
+    { id: 'feed', icon: <MessageSquare className="w-5 h-5" />, label: 'Feed', href: '/feed' },
+    { id: 'dispatch-center', icon: <Send className="w-5 h-5" />, label: 'Dispatch Center', href: '/dispatch-center' },
+    { id: 'api-keys', icon: <Key className="w-5 h-5" />, label: 'API Keys', href: '/api-keys' },
+    { id: 'connections', icon: <Link2 className="w-5 h-5" />, label: 'Connections', href: '/connections' },
+    { id: 'webhooks', icon: <Webhook className="w-5 h-5" />, label: 'Webhooks', href: '/webhooks' },
+    { id: 'templates', icon: <Layout className="w-5 h-5" />, label: 'Templates', href: '/templates' },
   ];
 
   const bottomItems = [
-    { icon: <FileText className="w-5 h-5" />, label: 'Docs' },
-    { icon: <LifeBuoy className="w-5 h-5" />, label: 'Support' },
+    { icon: <FileText className="w-5 h-5" />, label: 'Docs', href: '#' },
+    { icon: <LifeBuoy className="w-5 h-5" />, label: 'Support', href: '#' },
   ];
 
   return (
@@ -69,21 +71,24 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
 
       <nav className="flex-1 mt-4 overflow-y-auto no-scrollbar">
         <ul className="space-y-1 px-3">
-          {menuItems.map((item) => (
-            <li key={item.id}>
-              <button
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${activeTab === item.id
-                    ? 'bg-primary/10 text-primary border-l-2 border-primary rounded-none ml-[-12px] pl-[14px]'
-                    : 'hover:bg-white/5 hover:text-foreground'
-                  } ${isCollapsed ? 'justify-center px-0 ml-0 border-l-0 rounded-lg' : ''}`}
-                title={isCollapsed ? item.label : ''}
-              >
-                <div className="min-w-[20px]">{item.icon}</div>
-                {!isCollapsed && <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>}
-              </button>
-            </li>
-          ))}
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <li key={item.id}>
+                <Link
+                  href={item.href}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${isActive
+                      ? 'bg-primary/10 text-primary border-l-2 border-primary rounded-none ml-[-12px] pl-[14px]'
+                      : 'hover:bg-white/5 hover:text-foreground'
+                    } ${isCollapsed ? 'justify-center px-0 ml-0 border-l-0 rounded-lg' : ''}`}
+                  title={isCollapsed ? item.label : ''}
+                >
+                  <div className="min-w-[20px]">{item.icon}</div>
+                  {!isCollapsed && <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
@@ -102,15 +107,15 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
         <ul className="space-y-1 w-full">
           {bottomItems.map((item) => (
             <li key={item.label}>
-              <a
-                href="#"
+              <Link
+                href={item.href}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 hover:text-foreground transition-colors ${isCollapsed ? 'justify-center' : ''
                   }`}
                 title={isCollapsed ? item.label : ''}
               >
                 {item.icon}
                 {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
