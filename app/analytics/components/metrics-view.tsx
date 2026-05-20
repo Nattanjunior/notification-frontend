@@ -46,26 +46,29 @@ const AnalyticsView = () => {
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto p-6 gap-6 bg-background no-scrollbar">
+      {/* Top Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard title="Notifications Sent" value="1,248,308" change="+12%" />
-        <StatCard title="Delivery Rate" value="99.98%" />
-        <StatCard title="Active Connections" value="12,402" status="Stable" />
-        <StatCard title="Queue Health" value="Optimal" status="Optimal" />
-        <StatCard title="Avg Latency (ms)" value="42ms" change="+3ms" />
-        <StatCard title="Failed Deliveries" value="12" status="Retry Active" />
+        <StatCard title="Notificações Enviadas" value="1,248,308" change="+12%" />
+        <StatCard title="Taxa de Entrega" value="99.98%" />
+        <StatCard title="Conexões Ativas" value="12,402" status="Estável" />
+        <StatCard title="Saúde da Fila" value="Ótima" status="Ótima" />
+        <StatCard title="Latência Média (ms)" value="42ms" change="+3ms" />
+        <StatCard title="Entregas Falhas" value="12" status="Retentativa Ativa" />
       </div>
 
+      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column - Throughput Chart */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           <div className="bg-card/30 border border-border/50 rounded-xl p-6 flex flex-col gap-6">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="font-bold text-foreground">Notification Throughput</h3>
-                <p className="text-xs text-muted-foreground">Real-time notifications per second (24h Window)</p>
+                <h3 className="font-bold text-foreground">Taxa de Transferência de Notificações</h3>
+                <p className="text-xs text-muted-foreground">Notificações em tempo real por segundo (Janela de 24h)</p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> LIVE
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> AO VIVO
                 </div>
                 <div className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-muted-foreground">2.4k req/s</div>
               </div>
@@ -136,7 +139,7 @@ const AnalyticsView = () => {
 
         <div className="lg:col-span-4 flex flex-col gap-6">
           <div className="bg-card/30 border border-border/50 rounded-xl p-6 flex flex-col gap-6">
-            <h3 className="font-bold text-foreground">Delivery Composition</h3>
+            <h3 className="font-bold text-foreground">Composição de Entrega</h3>
             <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                 <circle
@@ -160,23 +163,22 @@ const AnalyticsView = () => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-bold">99.8%</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Efficiency</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Eficiência</span>
               </div>
             </div>
 
             <div className="space-y-3">
               {[
-                { label: 'Delivered', count: '1.1M', color: 'bg-primary' },
-                { label: 'Retried', count: '124k', color: 'bg-yellow-500/50' },
-                { label: 'Failed', count: '12', color: 'bg-red-500/50' },
-              ].map((item) => (
-                <div key={item.label} className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${item.color}`} />
-                    <span className="text-xs text-muted-foreground font-medium">{item.label}</span>
-                  </div>
-                  <span className="text-xs font-mono font-bold">{item.count}</span>
+                { label: 'Entregue', count: '1.1M', color: 'bg-primary' },
+                { label: 'Retentado', count: '124k', color: 'bg-yellow-500/50' },
+                { label: 'Falhou', count: '12', color: 'bg-red-500/50' },
+              ].map((item) => (<div key={item.label} className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                  <span className="text-xs text-muted-foreground font-medium">{item.label}</span>
                 </div>
+                <span className="text-xs font-mono font-bold">{item.count}</span>
+              </div>
               ))}
             </div>
           </div>
@@ -184,7 +186,7 @@ const AnalyticsView = () => {
           <div className="bg-card/30 border border-border/50 rounded-xl flex flex-col flex-1 overflow-hidden min-h-[400px]">
             <div className="px-4 py-3 border-b border-border/50 flex justify-between items-center bg-white/5">
               <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">
-                <Layout className="w-3 h-3" /> System Event Stream
+                <Layout className="w-3 h-3" /> Fluxo de Eventos do Sistema
               </span>
               <div className="flex gap-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-500/50" />
@@ -194,22 +196,22 @@ const AnalyticsView = () => {
             </div>
             <div className="p-4 font-mono text-[10px] space-y-2 overflow-y-auto max-h-[500px] no-scrollbar">
               {[
-                { time: '23:15:49', type: 'DISPATCH_ERROR', msg: 'Push/FCM Connection Lost' },
-                { time: '23:15:47', type: 'WS_MESSAGE', msg: 'Webhook/Slack Retrying...' },
-                { time: '23:15:44', type: 'DISPATCH_SUCCESS', msg: 'Push/FCM Delivery' },
-                { time: '14:24:01', type: 'DISPATCH_SUCCESS', msg: 'Push/FCM Delivery' },
-                { time: '14:24:02', type: 'WS_CONNECT', msg: 'Client node_usa_01' },
+                { time: '23:15:49', type: 'ERRO_DESPACHO', msg: 'Conexão Push/FCM Perdida' },
+                { time: '23:15:47', type: 'MS_MENSAGEM', msg: 'Retentando Webhook/Slack...' },
+                { time: '23:15:44', type: 'SUCESSO_DESPACHO', msg: 'Entrega Push/FCM' },
+                { time: '14:24:01', type: 'SUCESSO_DESPACHO', msg: 'Entrega Push/FCM' },
+                { time: '14:24:02', type: 'WS_CONECTAR', msg: 'Cliente node_usa_01' },
                 { time: '14:24:05', type: 'RETRY_BACKOFF', msg: 'Webhook/Stripe' },
-                { time: '14:24:08', type: 'DISPATCH_SUCCESS', msg: 'SMS/Twilio' },
-                { time: '14:24:12', type: 'DISPATCH_SUCCESS', msg: 'Email/SendGrid' },
-                { time: '14:24:15', type: 'WS_MESSAGE', msg: 'Channel global_broadcast' },
-                { time: '14:24:18', type: 'DISPATCH_SUCCESS', msg: 'Push/APNS Delivery' },
-                { time: '14:24:20', type: 'DISPATCH_SUCCESS', msg: 'System Alert' },
+                { time: '14:24:08', type: 'SUCESSO_DESPACHO', msg: 'SMS/Twilio' },
+                { time: '14:24:12', type: 'SUCESSO_DESPACHO', msg: 'Email/SendGrid' },
+                { time: '14:24:15', type: 'MS_MENSAGEM', msg: 'Canal global_broadcast' },
+                { time: '14:24:18', type: 'SUCESSO_DESPACHO', msg: 'Entrega Push/APNS' },
+                { time: '14:24:20', type: 'SUCESSO_DESPACHO', msg: 'Alerta do Sistema' },
               ].map((log, i) => (
                 <div key={i} className="flex gap-3 opacity-80 hover:opacity-100 transition-opacity">
                   <span className="text-muted-foreground">[{log.time}]</span>
-                  <span className={`font-bold ${log.type.includes('SUCCESS') ? 'text-green-400' :
-                    log.type.includes('ERROR') ? 'text-red-400' :
+                  <span className={`font-bold ${log.type.includes('SUCESSO') ? 'text-green-400' :
+                    log.type.includes('ERRO') ? 'text-red-400' :
                       log.type.includes('RETRY') ? 'text-yellow-400' : 'text-primary'
                     }`}>{log.type}</span>
                   <span className="text-foreground truncate">{log.msg}</span>
@@ -218,7 +220,7 @@ const AnalyticsView = () => {
             </div>
             <div className="mt-auto px-4 py-2 border-t border-border/30 bg-white/2 flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[9px] uppercase tracking-widest font-bold text-muted-foreground">Streaming Production Logs...</span>
+              <span className="text-[9px] uppercase tracking-widest font-bold text-muted-foreground">Transmitindo Logs de Produção...</span>
             </div>
           </div>
         </div>
