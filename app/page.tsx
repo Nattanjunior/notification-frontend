@@ -1,50 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import Sidebar from "@/app/components/layout/sidebar";
-import Header from "@/app/components/layout/header";
-import ActivityFeed from "@/app/components/dashboard/activity-feed";
-import LiveLog from "@/app/components/dashboard/live-log";
-import DispatchCore from "@/app/components/dashboard/dispatch-core";
-import MetricsView from "@/app/components/dashboard/metrics-view";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('metrics');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/analytics');
+  }, [router]);
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden text-foreground">
-      {/* Sidebar Fixa */}
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        isCollapsed={isCollapsed}
-        setIsCollapsed={setIsCollapsed}
-      />
-
-      {/* Área Principal */}
-      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
-        <Header />
-
-        <main className="flex-1 flex overflow-hidden">
-          {activeTab === 'metrics' ? (
-            <MetricsView />
-          ) : activeTab === 'feed' ? (
-            <>
-              {/* Feed de Atividades (Centro) */}
-              <ActivityFeed />
-
-              {/* Log em Tempo Real (Direita) - Apenas no Feed */}
-              <LiveLog />
-            </>
-          ) : activeTab === 'create' ? (
-            <DispatchCore />
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-muted">
-              Página em desenvolvimento...
-            </div>
-          )}
-        </main>
+    <div className="flex-1 flex items-center justify-center bg-background text-muted-foreground">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <span className="text-sm font-medium animate-pulse">Redirecting to Analytics...</span>
       </div>
     </div>
   );
