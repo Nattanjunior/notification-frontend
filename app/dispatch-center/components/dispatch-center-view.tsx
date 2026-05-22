@@ -21,20 +21,91 @@ import {
   Layout,
   Rocket,
   Settings,
-  ToggleRight
+  ToggleRight,
+  Loader2,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
-import LayoutClient from '@/app/components/layout/layout-client';
+import { notificationsService, Notification } from '@/app/lib/notifications';
+import { socket, connectWebSocket, disconnectWebSocket } from '@/app/lib/socket';
 
 const DispatchCenterView = () => {
   const [priority, setPriority] = useState('Alta');
   const [channels, setChannels] = useState(['WebSocket', 'Push']);
   const [schedule, setSchedule] = useState('Enviar Agora');
 
+  // Estados do formulário
+  const [recipientId, setRecipientId] = useState('8f6e5d4c-3b2a-1f0e-9d8c-7b6a5f4e3d2c');
+  const [category, setCategory] = useState('Transação do Sistema');
+  const [content, setContent] = useState('Pagamento autorizado para @jane_dev');
+
+  // Estados de submissão
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // Estado do Live Stream
+  const [liveLogs, setLiveLogs] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Carregar logs iniciais
+    async function loadInitialLogs() {
+      try {
+        const { notifications } = await notificationsService.getFromRecipient(recipientId);
+        setLiveLogs(notifications.slice(0, 5));
+      } catch (error) {
+        console.error('Erro ao carregar logs:', error);
+      }
+    }
+
+    loadInitialLogs();
+    connectWebSocket();
+
+    socket.on('newNotification', (data: any) => {
+      const newLog = {
+        id: data.id || Math.random().toString().substring(0, 8),
+        time: new Date().toLocaleTimeString(),
+        msg: data.content || data.message?.content,
+        type: data.category || data.message?.category || 'INFO',
+        lat: '12ms',
+        color: 'text-green-400'
+      };
+      setLiveLogs(prev => [newLog, ...prev].slice(0, 8));
+    });
+
+    return () => {
+      socket.off('newNotification');
+      disconnectWebSocket();
+    };
+  }, [recipientId]);
+
   const toggleChannel = (channel: string) => {
     if (channels.includes(channel)) {
       setChannels(channels.filter(c => c !== channel));
     } else {
       setChannels([...channels, channel]);
+    }
+  };
+
+  const handleExecuteDispatch = async () => {
+    try {
+      setIsSubmitting(true);
+      setStatusMessage(null);
+
+      await notificationsService.create({
+        recipientId,
+        content,
+        category
+      });
+
+      setStatusMessage({ type: 'success', text: 'Notificação enviada com sucesso!' });
+
+      // Limpar mensagem após 5 segundos
+      setTimeout(() => setStatusMessage(null), 5000);
+    } catch (error) {
+      console.error('Erro ao enviar despacho:', error);
+      setStatusMessage({ type: 'error', text: 'Falha ao enviar notificação. Verifique o console.' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,7 +136,8 @@ const DispatchCenterView = () => {
                   <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Identificador do Destinatário</label>
                   <input
                     type="text"
-                    defaultValue="usr_9482_alpha_prod"
+                    value={recipientId}
+                    onChange={(e) => setRecipientId(e.target.value)}
                     className="w-full bg-white/5 border border-border/50 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-primary/50 transition-all"
                   />
                 </div>
@@ -73,7 +145,11 @@ const DispatchCenterView = () => {
                 {/* Category */}
                 <div className="flex flex-col gap-3">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Categoria</label>
-                  <select className="w-full bg-white/5 border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/50 appearance-none transition-all">
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full bg-black/5 border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/50 appearance-none transition-all"
+                  >
                     <option>Transação do Sistema</option>
                     <option>Alerta do Usuário</option>
                     <option>Marketing</option>
@@ -154,21 +230,15 @@ const DispatchCenterView = () => {
               </div>
 
               <div className="bg-[#0a0a0c] border border-border/50 rounded-xl p-6 font-mono text-sm overflow-hidden relative group">
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   <button className="px-3 py-1 bg-white/10 rounded text-[10px] font-bold text-white hover:bg-white/20">Copiar</button>
                 </div>
-                <pre className="text-purple-300/90 leading-relaxed">
-                  {`{
-  "event_id": "dispatch_88291",
-  "actor": "system_admin",
-  "action": "payment_authorized",
-  "metadata": {
-    "amount": "499.00",
-    "currency": "USD",
-    "timestamp": "2023-11-20T14:48:01Z"
-  }
-}`}
-                </pre>
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="w-full bg-transparent text-purple-300/90 leading-relaxed resize-none focus:outline-none h-32 no-scrollbar"
+                  spellCheck={false}
+                />
               </div>
             </div>
 
@@ -301,10 +371,30 @@ const DispatchCenterView = () => {
             </div>
 
             {/* Execute Dispatch Button */}
-            <button className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-sm flex items-center justify-center gap-3 shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all group uppercase tracking-widest">
-              <Rocket className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              Executar Despacho
-            </button>
+            <div className="flex flex-col gap-4">
+              {statusMessage && (
+                <div className={`p-4 rounded-xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${statusMessage.type === 'success'
+                  ? 'bg-green-500/10 border-green-500/30 text-green-500'
+                  : 'bg-red-500/10 border-red-500/30 text-red-500'
+                  }`}>
+                  {statusMessage.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                  <span className="text-xs font-bold">{statusMessage.text}</span>
+                </div>
+              )}
+
+              <button
+                onClick={handleExecuteDispatch}
+                disabled={isSubmitting}
+                className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-sm flex items-center justify-center gap-3 shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all group uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Rocket className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                )}
+                {isSubmitting ? 'Processando...' : 'Executar Despacho'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -326,21 +416,15 @@ const DispatchCenterView = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 no-scrollbar">
-          {[
-            { id: '#DP-44021', time: '14:55:02', msg: 'Pagamento autorizado para @jane_dev', type: 'WS_OK', lat: '8ms', color: 'text-green-400' },
-            { id: '#DP-44018', time: '14:54:58', msg: 'Alerta do sistema: Alto uso de CPU no Nó-7', type: 'PUSH_RETRY', lat: '240ms', color: 'text-yellow-400' },
-            { id: '#DP-44015', time: '14:54:45', msg: 'Chave de API rotacionada para o Projeto: Mercury', type: 'WS_OK', lat: '11ms', color: 'text-green-400' },
-            { id: '#DP-44012', time: '14:54:20', msg: 'Despacho em lote: 154 itens na fila', type: 'ASYNC_OK', lat: '', color: 'text-blue-400' },
-            { id: '#DP-44010', time: '14:53:55', msg: 'Falha no despacho: Destinatário inacessível', type: 'ERR_TIMEOUT', lat: '', color: 'text-red-400' },
-          ].map((log) => (
+          {liveLogs.map((log) => (
             <div key={log.id} className="bg-white/2 border border-border/30 rounded-xl p-4 flex flex-col gap-3 group hover:border-primary/30 transition-all cursor-pointer">
               <div className="flex justify-between items-start">
-                <span className={`text-[10px] font-mono font-bold ${log.color}`}>{log.id}</span>
-                <span className="text-[10px] text-muted-foreground">{log.time}</span>
+                <span className={`text-[10px] font-mono font-bold ${log.color || 'text-primary'}`}>#{log.id.substring(0, 8)}</span>
+                <span className="text-[10px] text-muted-foreground">{log.time || new Date(log.createdAt).toLocaleTimeString()}</span>
               </div>
-              <p className="text-[11px] font-medium text-foreground/90 leading-relaxed">{log.msg}</p>
+              <p className="text-[11px] font-medium text-foreground/90 leading-relaxed">{log.msg || log.content}</p>
               <div className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-muted-foreground uppercase bg-white/5 px-2 py-0.5 rounded border border-border/30 tracking-widest">{log.type}</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase bg-white/5 px-2 py-0.5 rounded border border-border/30 tracking-widest">{log.type || log.category}</span>
                 {log.lat && <span className="text-[9px] text-muted-foreground font-mono">Lat: {log.lat}</span>}
               </div>
             </div>

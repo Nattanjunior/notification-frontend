@@ -14,8 +14,12 @@ import {
   Mail,
   MessageSquare,
   Globe,
-  Layout
+  Layout,
+  Loader2,
+  Smartphone
 } from 'lucide-react';
+import { notificationsService, Notification } from '@/app/lib/notifications';
+import { socket, connectWebSocket, disconnectWebSocket } from '@/app/lib/socket';
 
 const StatCard = ({ title, value, change, status, icon: Icon }: any) => (
   <div className="bg-card/30 border border-border/50 rounded-xl p-4 flex flex-col gap-1">
@@ -30,7 +34,7 @@ const StatCard = ({ title, value, change, status, icon: Icon }: any) => (
       {status && (
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] font-bold text-muted-foreground">{status}</span>
-          <div className={`w-1.5 h-1.5 rounded-full ${status === 'Optimal' || status === 'Stable' ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`} />
+          <div className={`w-1.5 h-1.5 rounded-full ${status === 'Ótima' || status === 'Estável' ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`} />
         </div>
       )}
     </div>
@@ -39,21 +43,118 @@ const StatCard = ({ title, value, change, status, icon: Icon }: any) => (
 
 const AnalyticsView = () => {
   const [throughputData, setThroughputData] = useState<number[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    total: 0,
+    delivered: 0,
+    failed: 0,
+    rate: '0%',
+    activeConnections: '0',
+    avgLatency: '0ms'
+  });
+
+  const DEFAULT_RECIPIENT_ID = '8f6e5d4c-3b2a-1f0e-9d8c-7b6a5f4e3d2c';
+
+  const calculateStats = (data: Notification[]) => {
+    const total = data.length;
+    const failed = data.filter(n => n.canceledAt).length;
+    const delivered = data.filter(n => n.readAt).length;
+    const rate = total > 0 ? (((total - failed) / total) * 100).toFixed(1) + '%' : '0%';
+    
+    // Simular conexões e latência baseadas no volume de dados
+    const activeConnections = (total * 3 + 142).toLocaleString();
+    const avgLatency = total > 0 ? (Math.floor(Math.random() * 20) + 30) + 'ms' : '0ms';
+
+    return { total, delivered, failed, rate, activeConnections, avgLatency };
+  };
+
+  const generateThroughput = (data: Notification[]) => {
+    // Gerar 40 pontos de dados baseados na distribuição real ou simulada se houver poucos dados
+    if (data.length === 0) return Array.from({ length: 40 }, () => 0);
+    
+    // Se houver dados, vamos criar uma curva que faça sentido
+    const base = Array.from({ length: 40 }, () => Math.floor(Math.random() * 20) + 10);
+    // Adicionar picos onde temos notificações reais (simulado por enquanto)
+    return base.map(v => Math.min(100, v + (data.length / 5)));
+  };
 
   useEffect(() => {
-    setThroughputData(Array.from({ length: 40 }, () => Math.floor(Math.random() * 80) + 20));
+    async function loadData() {
+      try {
+        setIsLoading(true);
+        const { notifications: data } = await notificationsService.getFromRecipient(DEFAULT_RECIPIENT_ID);
+        setNotifications(data);
+        setStats(calculateStats(data));
+        setThroughputData(generateThroughput(data));
+      } catch (error) {
+        console.error('Erro ao carregar dados de análise:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+    connectWebSocket();
+
+    socket.on('newNotification', (data: any) => {
+      setNotifications(prev => {
+        const newNotification: Notification = {
+          id: data.id || Math.random().toString(),
+          content: data.content || data.message?.content,
+          category: data.category || data.message?.category,
+          recipientId: data.recipientId || data.message?.recipientId,
+          createdAt: data.createdAt || new Date().toISOString(),
+          readAt: data.readAt,
+          canceledAt: data.canceledAt
+        };
+
+        const newList = [newNotification, ...prev];
+        setStats(calculateStats(newList));
+        return newList;
+      });
+    });
+
+    return () => {
+      socket.off('newNotification');
+      disconnectWebSocket();
+    };
   }, []);
+
+  if (isLoading) {
+    return ( 
+      <div className="flex-1 flex flex-col items-center justify-center bg-background text-muted-foreground">
+        <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
+        <p className="text-sm font-medium animate-pulse">Carregando métricas em tempo real...</p>
+      </div>
+    );
+  }
+
+  // Mapear logs do sistema das notificações reais
+  const systemLogs = notifications.slice(0, 10).map(n => ({
+    time: new Date(n.createdAt).toLocaleTimeString(),
+    type: n.canceledAt ? 'ERRO_DESPACHO' : 'SUCESSO_DESPACHO',
+    msg: n.content
+  }));
+
+  // Canais baseados nas categorias reais
+  const categories = Array.from(new Set(notifications.map(n => n.category)));
+  const channelData = [
+    { name: 'WebSocket', icon: Wifi, success: 99.8, latency: '12ms', throughput: '1.2k/s', connections: stats.activeConnections, color: 'bg-green-500' },
+    { name: 'Push (iOS/And)', icon: Smartphone, success: 98.4, latency: '145ms', throughput: '450/s', connections: '3,120', color: 'bg-green-500' },
+    { name: 'Email (SMTP)', icon: Mail, success: 94.2, latency: '2.4s', throughput: '82/s', connections: '142', color: 'bg-green-500' },
+  ];
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto p-6 gap-6 bg-background no-scrollbar">
       {/* Top Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard title="Notificações Enviadas" value="1,248,308" change="+12%" />
-        <StatCard title="Taxa de Entrega" value="99.98%" />
-        <StatCard title="Conexões Ativas" value="12,402" status="Estável" />
+        <StatCard title="Notificações Enviadas" value={stats.total.toLocaleString()} change={stats.total > 0 ? "+100%" : "0%"} />
+        <StatCard title="Taxa de Entrega" value={stats.rate} />
+        <StatCard title="Conexões Ativas" value={stats.activeConnections} status="Estável" />
         <StatCard title="Saúde da Fila" value="Ótima" status="Ótima" />
-        <StatCard title="Latência Média (ms)" value="42ms" change="+3ms" />
-        <StatCard title="Entregas Falhas" value="12" status="Retentativa Ativa" />
+        <StatCard title="Latência Média" value={stats.avgLatency} change="-2ms" />
+        <StatCard title="Entregas Falhas" value={stats.failed.toString()} status={stats.failed > 0 ? "Revisão Necessária" : "Tudo OK"} />
       </div>
 
       {/* Main Content Grid */}
@@ -70,7 +171,9 @@ const AnalyticsView = () => {
                 <div className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> AO VIVO
                 </div>
-                <div className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-muted-foreground">2.4k req/s</div>
+                <div className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-muted-foreground">
+                  {(stats.total / 10).toFixed(1)} req/s
+                </div>
               </div>
             </div>
 
@@ -87,30 +190,24 @@ const AnalyticsView = () => {
 
           <div className="bg-card/30 border border-border/50 rounded-xl overflow-hidden">
             <div className="px-6 py-4 border-b border-border/50 flex justify-between items-center">
-              <h3 className="font-bold">Channel Performance</h3>
+              <h3 className="font-bold">Desempenho por Canal</h3>
               <button className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground flex items-center gap-2">
-                Export CSV <Download className="w-3 h-3" />
+                Exportar CSV <Download className="w-3 h-3" />
               </button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="text-[10px] uppercase tracking-widest text-muted-foreground border-b border-border/30">
-                    <th className="px-6 py-4 font-bold">Channel</th>
-                    <th className="px-6 py-4 font-bold">Success %</th>
-                    <th className="px-6 py-4 font-bold">Avg Latency</th>
-                    <th className="px-6 py-4 font-bold">Throughput</th>
-                    <th className="px-6 py-4 font-bold">Connections</th>
+                    <th className="px-6 py-4 font-bold">Canal</th>
+                    <th className="px-6 py-4 font-bold">Sucesso %</th>
+                    <th className="px-6 py-4 font-bold">Latência Média</th>
+                    <th className="px-6 py-4 font-bold">Vazão</th>
+                    <th className="px-6 py-4 font-bold">Conexões</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30">
-                  {[
-                    { name: 'WebSocket', icon: Wifi, success: 99.8, latency: '12ms', throughput: '1.2k/s', connections: '8,421', color: 'bg-green-500' },
-                    { name: 'Push (iOS/And)', icon: Bell, success: 98.4, latency: '145ms', throughput: '450/s', connections: '3,120', color: 'bg-green-500' },
-                    { name: 'Email (SMTP)', icon: Mail, success: 94.2, latency: '2.4s', throughput: '82/s', connections: '142', color: 'bg-green-500' },
-                    { name: 'SMS (Twilio)', icon: MessageSquare, success: 97.1, latency: '4.2s', throughput: '15/s', connections: '8', color: 'bg-green-500' },
-                    { name: 'Webhook', icon: Globe, success: 88.5, latency: '312ms', throughput: '620/s', connections: '54', color: 'bg-yellow-500' },
-                  ].map((row) => (
+                  {channelData.map((row) => (
                     <tr key={row.name} className="hover:bg-white/5 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -145,33 +242,21 @@ const AnalyticsView = () => {
                 <circle
                   cx="50" cy="50" r="40"
                   fill="transparent" stroke="currentColor" strokeWidth="8"
-                  strokeDasharray="251.2" strokeDashoffset="25.12"
-                  className="text-primary"
-                />
-                <circle
-                  cx="50" cy="50" r="40"
-                  fill="transparent" stroke="currentColor" strokeWidth="8"
-                  strokeDasharray="251.2" strokeDashoffset="226.08"
-                  className="text-yellow-500/50"
-                />
-                <circle
-                  cx="50" cy="50" r="40"
-                  fill="transparent" stroke="currentColor" strokeWidth="8"
-                  strokeDasharray="251.2" strokeDashoffset="248.68"
-                  className="text-red-500/50"
+                  strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * (parseFloat(stats.rate) / 100))}
+                  className="text-primary transition-all duration-1000"
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold">99.8%</span>
+                <span className="text-2xl font-bold">{stats.rate}</span>
                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Eficiência</span>
               </div>
             </div>
 
             <div className="space-y-3">
               {[
-                { label: 'Entregue', count: '1.1M', color: 'bg-primary' },
-                { label: 'Retentado', count: '124k', color: 'bg-yellow-500/50' },
-                { label: 'Falhou', count: '12', color: 'bg-red-500/50' },
+                { label: 'Entregue', count: stats.delivered, color: 'bg-primary' },
+                { label: 'Pendente', count: stats.total - stats.delivered - stats.failed, color: 'bg-yellow-500/50' },
+                { label: 'Falhou', count: stats.failed, color: 'bg-red-500/50' },
               ].map((item) => (<div key={item.label} className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${item.color}`} />
@@ -195,19 +280,7 @@ const AnalyticsView = () => {
               </div>
             </div>
             <div className="p-4 font-mono text-[10px] space-y-2 overflow-y-auto max-h-[500px] no-scrollbar">
-              {[
-                { time: '23:15:49', type: 'ERRO_DESPACHO', msg: 'Conexão Push/FCM Perdida' },
-                { time: '23:15:47', type: 'MS_MENSAGEM', msg: 'Retentando Webhook/Slack...' },
-                { time: '23:15:44', type: 'SUCESSO_DESPACHO', msg: 'Entrega Push/FCM' },
-                { time: '14:24:01', type: 'SUCESSO_DESPACHO', msg: 'Entrega Push/FCM' },
-                { time: '14:24:02', type: 'WS_CONECTAR', msg: 'Cliente node_usa_01' },
-                { time: '14:24:05', type: 'RETRY_BACKOFF', msg: 'Webhook/Stripe' },
-                { time: '14:24:08', type: 'SUCESSO_DESPACHO', msg: 'SMS/Twilio' },
-                { time: '14:24:12', type: 'SUCESSO_DESPACHO', msg: 'Email/SendGrid' },
-                { time: '14:24:15', type: 'MS_MENSAGEM', msg: 'Canal global_broadcast' },
-                { time: '14:24:18', type: 'SUCESSO_DESPACHO', msg: 'Entrega Push/APNS' },
-                { time: '14:24:20', type: 'SUCESSO_DESPACHO', msg: 'Alerta do Sistema' },
-              ].map((log, i) => (
+              {systemLogs.length > 0 ? systemLogs.map((log, i) => (
                 <div key={i} className="flex gap-3 opacity-80 hover:opacity-100 transition-opacity">
                   <span className="text-muted-foreground">[{log.time}]</span>
                   <span className={`font-bold ${log.type.includes('SUCESSO') ? 'text-green-400' :
@@ -216,7 +289,9 @@ const AnalyticsView = () => {
                     }`}>{log.type}</span>
                   <span className="text-foreground truncate">{log.msg}</span>
                 </div>
-              ))}
+              )) : (
+                <div className="text-muted-foreground italic text-center py-8">Aguardando novos eventos...</div>
+              )}
             </div>
             <div className="mt-auto px-4 py-2 border-t border-border/30 bg-white/2 flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
